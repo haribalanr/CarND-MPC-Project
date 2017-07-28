@@ -14,6 +14,11 @@ The kinematic model considers the vehicle's coordinates along x & y, orientation
 
 ![ ](./formula1.png)
 
+Error:
+
+![ ](./formula2.png)
+
+
 ###### Model Predictive Control with Latency: 
 
 An complication of this project consists in taking delayed actuations into account. When delays are not properly accounted for oscillations and/or bad trajectories can occur. 
