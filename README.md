@@ -12,7 +12,7 @@ I have used the started code and also code from the course material for this pro
 
 The kinematic model considers the vehicle's coordinates along x & y, orientation angle (psi), and velocity, the cross-track error  and psi error (epsi). Actuator outputs are acceleration and delta (steering angle). The model combines the state and actuations from the previous timestep to calculate the state for the current timestep. This is done based on the mathematical equation:
 
-![Alt text](formulat1.png)
+![ ](./formula1.png)
 
 ###### Model Predictive Control with Latency: 
 
