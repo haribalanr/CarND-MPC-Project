@@ -1,6 +1,64 @@
 # CarND-Controls-MPC
 Self-Driving Car Engineer Nanodegree Program
 
+https://youtu.be/PBJMTJt_vLM
+
+This project is implementation of the MPC project using C++ as part of the Udacity SDCND. The goal is to navigate the track in the simulator, which communicates telemetry and track waypoint data via websocket, by sending steering and acceleration commands. The solution must be work with 100ms latency, as one may encounter in real-world application.
+
+I have used the IPOPT and CPPAD libraries to calculate an optimal trajectory and its associated actuation commands in order to minimize error with a third-degree polynomial fit to the given waypoints. This optimization considers only a short duration's of waypoints, and produces a trajectory for that duration based upon a model of the vehicle's kinematics and a cost function based mostly on the vehicle's CTE (cross-track error) (roughly the distance from the track waypoints) and orientation angle error, with other cost factors included to improve performance. 
+
+I have used the started code and also code from the course material for this project work. I approached this work with basic understanding of motion laws such as [ velocity = distance travled / time taken ] and applying complexity to this by adding the co-ordinates/direction of travel.
+
+###### The Model
+
+The kinematic model considers the vehicle's coordinates along x & y, orientation angle (psi), and velocity, the cross-track error  and psi error (epsi). Actuator outputs are acceleration and delta (steering angle). The model combines the state and actuations from the previous timestep to calculate the state for the current timestep. This is done based on the mathematical equation:
+
+![ ](./formula1.png)
+
+Error:
+
+![ ](./formula2.png)
+
+
+###### Model Predictive Control with Latency: 
+
+An complication of this project consists in taking delayed actuations into account. When delays are not properly accounted for oscillations and/or bad trajectories can occur. 
+
+The approach to dealing with latency was twofold (not counting simply limiting the speed): The original kinematic equations depend upon the actuations from the previous timestep, but with a delay of 100ms (which happens to be the timestep interval) the actuations are applied another timestep later, so the equations have been altered to account for this:   (i.e.) using previous actuations to account for latency
+
+      if (t > 1) {   
+        a = vars[a_start + t - 2];
+        delta = vars[delta_start + t - 2];
+      }
+
+Also, in addition to the cost functions as per the lessons (punishing CTE, epsi, difference between velocity and a reference velocity, delta, acceleration, change in delta, and change in acceleration) an additional cost penalizing the combination of velocity and delta was included and results in much more controlled cornering.
+
+      fg[0] += 700*CppAD::pow(vars[delta_start + i] * vars[v_start+i], 2);
+
+###### Timestep Length and Elapsed Duration (N & dt): 
+
+The time T=N dt defines the prediction horizon. If prediction horizons is too short, this lead to more responsive controlers, but are less accurate and can suffer from instabilities when chosen too short. Longer Prediction horizons generally lead to smoother controls but too is also a bad choice. For a given prediction horizon shorter time steps dt imply more accurate controls but also require a larger NMPC problem to be solved, thus increasing latency.
+
+The values chosen for N and dt are 10 and 0.1, respectively. (please note that Udacity support suggestion helped a lot). These values mean that the optimizer is considering a one-second duration in which to determine a corrective trajectory. Adjusting either N or dt (even by small amounts) often produced erratic behavior. Other values tried include 20 / 0.05, 12 /0.06, 8 / 0.125, 6 / 0.15, and many others.
+
+
+###### Polynomial Fitting and MPC Preprocessing: 
+
+The waypoints are preprocessed by transforming them to the vehicle's perspective.
+		  
+          for (int i = 0; i < ptsx.size(); i++) {
+            double dx = ptsx[i] - px;
+            double dy = ptsy[i] - py;
+            waypoints_x.push_back(dx * cos(-psi) - dy * sin(-psi));
+            waypoints_y.push_back(dx * sin(-psi) + dy * cos(-psi));
+          }
+    
+ This simplifies the process to fit a polynomial to the waypoints because the vehicle's x and y coordinates are now at the origin (0, 0) and the orientation angle is also zero.
+
+Video:
+
+https://youtu.be/PBJMTJt_vLM
+
 ---
 
 ## Dependencies
