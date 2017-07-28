@@ -1,6 +1,7 @@
 # CarND-Controls-MPC
 Self-Driving Car Engineer Nanodegree Program
 
+https://youtu.be/PBJMTJt_vLM
 
 This project is implementation of the MPC project using C++ as part of the Udacity SDCND. The goal is to navigate the track in the simulator, which communicates telemetry and track waypoint data via websocket, by sending steering and acceleration commands. The solution must be work with 100ms latency, as one may encounter in real-world application.
 
@@ -54,7 +55,9 @@ The waypoints are preprocessed by transforming them to the vehicle's perspective
     
  This simplifies the process to fit a polynomial to the waypoints because the vehicle's x and y coordinates are now at the origin (0, 0) and the orientation angle is also zero.
 
+Video:
 
+https://youtu.be/PBJMTJt_vLM
 
 ---
 
